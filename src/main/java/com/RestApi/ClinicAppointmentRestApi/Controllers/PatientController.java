@@ -1,0 +1,99 @@
+package com.RestApi.ClinicAppointmentRestApi.Controllers;
+
+import com.RestApi.ClinicAppointmentRestApi.DTOs.AppointmentDTOInPatient;
+import com.RestApi.ClinicAppointmentRestApi.Entities.Patient;
+import com.RestApi.ClinicAppointmentRestApi.Exceptions.PatientNotFoundException;
+import com.RestApi.ClinicAppointmentRestApi.Mapper.AppointmentMapper;
+import com.RestApi.ClinicAppointmentRestApi.Service.PatientService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@RestController
+@RequestMapping("api/patients")
+public class PatientController {
+
+    @Autowired
+    private PatientService patientService;
+
+    @Autowired
+    private AppointmentMapper appointmentMapper;
+
+    // For creating new patient record
+    @PostMapping
+    public ResponseEntity<Patient> create(@Valid @RequestBody Patient patient) {
+        return ResponseEntity.ok(patientService.create(patient));
+    }
+
+    // Fetch patient record by id
+    @GetMapping("/{id}")
+    public ResponseEntity<Patient> findPatientById(@PathVariable("id") Long patientId) {
+        try {
+            return ResponseEntity.ok(patientService.findPatientById(patientId));
+        } catch (PatientNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    // Fetch all patient records
+    @GetMapping
+    public ResponseEntity<List<Patient>> patients() {
+        List<Patient> patients = patientService.patients();
+        return ResponseEntity.ok(patients);
+    }
+
+    // Fetch all appointments of a patient using patient's id
+    // Appointments are converted to DTO
+    @GetMapping("/{id}/appointments")
+    public ResponseEntity<List<AppointmentDTOInPatient>> appointmentsOfPatient(
+            @PathVariable("id") Long patientId) {
+        try {
+            List<AppointmentDTOInPatient> appointmentsByPatient = patientService.appointmentsByPatient(patientId)
+                    .stream()
+                    .map(appointmentMapper::toAppointmentDTOInPatient)
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok(appointmentsByPatient);
+        } catch (PatientNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    // Find patient by first name and last name
+    @GetMapping("/query")
+    public ResponseEntity<Patient> findPatientByFirstNameAndLastName(@RequestParam String firstName,
+                                                                     @RequestParam String lastName) {
+        try {
+            Patient patient = patientService.findByFirstNameAndLastName(firstName, lastName);
+            return ResponseEntity.ok(patient);
+        } catch (PatientNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    @PutMapping("/{id}")
+    public ResponseEntity<Patient> update(@PathVariable("id") Long patientId,
+                                          @RequestBody Patient patient) {
+
+        try {
+            Patient patient1 = patientService.update(patientId, patient);
+            return ResponseEntity.ok(patient1);
+        } catch (PatientNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> delete(@PathVariable("id") Long patientId) {
+
+        try {
+            patientService.delete(patientId);
+            return ResponseEntity.ok("Patient record deleted successfully.");
+        } catch (PatientNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+}

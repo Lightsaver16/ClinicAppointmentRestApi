@@ -92,7 +92,7 @@ public class AppointmentController {
 
     }
     // Cancel Appointment by Appointment id
-    @PutMapping("/{id}")
+    @PutMapping("/{id}/cancel")
     public ResponseEntity<String> cancelAppointment(@PathVariable("id") Long appointmentId) {
         try {
             Appointment appointment = appointmentService.findAppointmentById(appointmentId);

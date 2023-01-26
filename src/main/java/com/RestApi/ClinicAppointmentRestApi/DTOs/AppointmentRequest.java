@@ -1,4 +1,4 @@
-package com.RestApi.ClinicAppointmentRestApi.Request;
+package com.RestApi.ClinicAppointmentRestApi.DTOs;
 
 import lombok.Data;
 

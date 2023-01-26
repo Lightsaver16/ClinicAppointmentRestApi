@@ -2,8 +2,8 @@ package com.RestApi.ClinicAppointmentRestApi.Service;
 
 import com.RestApi.ClinicAppointmentRestApi.Entities.Appointment;
 import com.RestApi.ClinicAppointmentRestApi.Exceptions.*;
-import com.RestApi.ClinicAppointmentRestApi.Request.AppointmentDateAndTimeRequest;
-import com.RestApi.ClinicAppointmentRestApi.Request.AppointmentRequest;
+import com.RestApi.ClinicAppointmentRestApi.DTOs.AppointmentDateAndTimeRequest;
+import com.RestApi.ClinicAppointmentRestApi.DTOs.AppointmentRequest;
 
 import java.util.List;
 

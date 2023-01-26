@@ -1,6 +1,7 @@
 package com.RestApi.ClinicAppointmentRestApi.ExceptionHandler;
 
 import com.RestApi.ClinicAppointmentRestApi.Exceptions.AppointmentNotFoundException;
+import com.RestApi.ClinicAppointmentRestApi.Exceptions.DoctorNotAvailableException;
 import com.RestApi.ClinicAppointmentRestApi.Exceptions.DoctorNotFoundException;
 import com.RestApi.ClinicAppointmentRestApi.Exceptions.PatientNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -30,6 +31,13 @@ public class RestApiExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
     public String patientNotFound(PatientNotFoundException e) {
+        return e.getMessage();
+    }
+
+    @ExceptionHandler(DoctorNotAvailableException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseBody
+    public String doctorNotAvailable(DoctorNotAvailableException e) {
         return e.getMessage();
     }
 }

@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -62,7 +63,7 @@ public class AppointmentController {
     // Find all appointments by date
     @GetMapping("/query")
     public ResponseEntity<List<AppointmentDTO>> appointmentsByDate(
-            @RequestParam String appointmentDate) {
+            @RequestParam(value = "date") String appointmentDate) {
 
         try {
             List<AppointmentDTO> appointmentDTOList = appointmentService.findByAppointmentDate(appointmentDate)
@@ -95,7 +96,7 @@ public class AppointmentController {
     @PutMapping("/{id}/cancel")
     public ResponseEntity<String> cancelAppointment(@PathVariable("id") Long appointmentId) {
         try {
-            Appointment appointment = appointmentService.findAppointmentById(appointmentId);
+            appointmentService.cancel(appointmentId);
             return ResponseEntity.ok("Appointment cancelled");
         } catch (AppointmentNotFoundException e) {
             throw new RuntimeException(e);

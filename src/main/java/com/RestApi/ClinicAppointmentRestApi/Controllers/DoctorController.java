@@ -49,7 +49,7 @@ public class DoctorController {
                                          @RequestBody Doctor doctor) {
         try {
             Doctor doc = doctorService.update(doctorId, doctor);
-            return ResponseEntity.ok(doctor);
+            return ResponseEntity.ok(doc);
         } catch (DoctorNotFoundException e) {
             throw new RuntimeException(e);
         }

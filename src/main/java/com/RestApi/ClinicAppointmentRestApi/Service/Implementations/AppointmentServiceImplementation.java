@@ -84,6 +84,7 @@ public class AppointmentServiceImplementation implements AppointmentService {
         Appointment appointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new AppointmentNotFoundException(appointmentId));
         appointment.setAppointmentStatus(AppointmentStatus.CANCELLED);
+        appointmentRepository.save(appointment);
     }
 
     @Override

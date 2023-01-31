@@ -135,10 +135,11 @@ public class AppointmentController {
     }
     // Change date and time of appointment by appointment id
     @PutMapping("/{id}/change-date-time")
-    public ResponseEntity<Appointment> changeDateAndTime (@PathVariable("id") Long appointmentId,
-                                                          @RequestBody AppointmentDateAndTimeRequest request) {
+    public ResponseEntity<AppointmentDTO> changeDateAndTime (@PathVariable("id") Long appointmentId,
+                                                             @RequestBody AppointmentDateAndTimeRequest request) {
         try {
-            return ResponseEntity.ok(appointmentService.changeDateAndTime(appointmentId, request));
+            AppointmentDTO appointmentDTO = appointmentService.changeDateAndTime(appointmentId, request);
+            return new ResponseEntity<>(appointmentDTO, HttpStatus.OK);
         } catch (AppointmentNotFoundException | AppointmentCannotBeUpdatedException | PatientNotFoundException e) {
             throw new RuntimeException(e);
         }
@@ -149,10 +150,9 @@ public class AppointmentController {
                                                         @PathVariable("doctorId") Long doctorId) {
 
         try {
-            AppointmentDTO appointmentDTO = appointmentMapper.toAppointmentDTO(
-                    appointmentService.changeDoctor(appointmentId, doctorId));
+            AppointmentDTO appointmentDTO = appointmentService.changeDoctor(appointmentId, doctorId);
 
-            return ResponseEntity.ok(appointmentDTO);
+            return new ResponseEntity<>(appointmentDTO, HttpStatus.OK);
 
         } catch (AppointmentNotFoundException | DoctorNotFoundException e) {
             throw new RuntimeException(e);

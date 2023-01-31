@@ -115,7 +115,7 @@ public class AppointmentServiceImplementation implements AppointmentService {
     }
 
     @Override
-    public Appointment changeDateAndTime(Long appointmentId, AppointmentDateAndTimeRequest request) throws AppointmentNotFoundException{
+    public AppointmentDTO changeDateAndTime(Long appointmentId, AppointmentDateAndTimeRequest request) throws AppointmentNotFoundException{
         Appointment appointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(()-> new AppointmentNotFoundException(appointmentId));
 
@@ -131,11 +131,13 @@ public class AppointmentServiceImplementation implements AppointmentService {
             appointment.setAppointmentTime(request.getAppointmentTime());
         }
 
-        return appointmentRepository.save(appointment);
+        appointmentRepository.save(appointment);
+
+        return appointmentMapper.toAppointmentDTO(appointment);
     }
 
     @Override
-    public Appointment changeDoctor(Long appointmentId, Long doctorId) throws AppointmentNotFoundException, DoctorNotFoundException {
+    public AppointmentDTO changeDoctor(Long appointmentId, Long doctorId) throws AppointmentNotFoundException, DoctorNotFoundException {
         Appointment appointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(()-> new AppointmentNotFoundException(appointmentId));
         Doctor doctor = doctorRepository.findById(doctorId)
@@ -143,7 +145,9 @@ public class AppointmentServiceImplementation implements AppointmentService {
 
         appointment.setDoctor(doctor);
 
-        return appointmentRepository.save(appointment);
+        appointmentRepository.save(appointment);
+
+        return appointmentMapper.toAppointmentDTO(appointment);
 
     }
 

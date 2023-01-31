@@ -8,32 +8,39 @@ import com.RestApi.ClinicAppointmentRestApi.DTOs.AppointmentDateAndTimeRequest;
 import com.RestApi.ClinicAppointmentRestApi.DTOs.AppointmentRequest;
 import com.RestApi.ClinicAppointmentRestApi.Service.AppointmentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/appointments")
 public class AppointmentController {
-    @Autowired
+
     private AppointmentService appointmentService;
+    private AppointmentMapper appointmentMapper;
 
     @Autowired
-    private AppointmentMapper appointmentMapper;
+    public AppointmentController(AppointmentService appointmentService,
+                                 AppointmentMapper appointmentMapper) {
+        this.appointmentService = appointmentService;
+        this.appointmentMapper = appointmentMapper;
+    }
 
     // Create new appointment
     @PostMapping
     public ResponseEntity<AppointmentDTO> create (@Valid @RequestBody AppointmentRequest appointmentRequest) {
-        try {
-            AppointmentDTO appointmentDTO = appointmentMapper.toAppointmentDTO(
-                    appointmentService.create(appointmentRequest));
 
-            return ResponseEntity.ok(appointmentDTO);
-        } catch (DoctorNotFoundException | PatientNotFoundException | DoctorNotAvailableException e) {
+        try {
+            AppointmentDTO appointmentDTO = appointmentService.create(appointmentRequest);
+            return new ResponseEntity<>(appointmentDTO, HttpStatus.CREATED);
+        } catch (DoctorNotFoundException | DoctorNotAvailableException | PatientNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
@@ -41,63 +48,87 @@ public class AppointmentController {
     @GetMapping("/{id}")
     public ResponseEntity<AppointmentDTO> findAppointmentById(@PathVariable("id") Long appointmentId) {
         try {
-            Appointment appointment = appointmentService.findAppointmentById(appointmentId);
-            AppointmentDTO appointmentDTO = appointmentMapper.toAppointmentDTO(appointment);
-            return ResponseEntity.ok(appointmentDTO);
+            AppointmentDTO appointmentDTO = appointmentService.findAppointmentById(appointmentId);
+            return new ResponseEntity<>(appointmentDTO, HttpStatus.OK);
         } catch (AppointmentNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
-
     // Fetch all appointment records then convert to dto
     @GetMapping
-    public ResponseEntity<List<AppointmentDTO>> appointments(){
-        List<AppointmentDTO> appointmentDTOS = appointmentService.appointments()
-                .stream()
-                .map(appointmentMapper::toAppointmentDTO)
-                .collect(Collectors.toList());
+    public ResponseEntity<List<AppointmentDTO>> findAllAppointments(@RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
+                                                                    @RequestParam(value = "pageSize", defaultValue = "10", required = false) int pageSize,
+                                                                    @RequestParam(value = "sortBy", defaultValue = "appointmentId", required = false) String sortBy,
+                                                                    @RequestParam(value = "order", defaultValue = "ascending", required = false) String order){
+        Sort sort;
+        if (order.equalsIgnoreCase("ascending")) {
+            sort = Sort.by((sortBy)).ascending();
+        } else {
+            sort = Sort.by((sortBy)).descending();
+        }
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
 
-        return ResponseEntity.ok(appointmentDTOS);
-    }
-
-    // Find all appointments by date
-    @GetMapping("/query")
-    public ResponseEntity<List<AppointmentDTO>> appointmentsByDate(
-            @RequestParam(value = "date") String appointmentDate) {
-
-        try {
-            List<AppointmentDTO> appointmentDTOList = appointmentService.findByAppointmentDate(appointmentDate)
-                    .stream()
-                    .map(appointmentMapper::toAppointmentDTO)
-                    .collect(Collectors.toList());
-
-            return ResponseEntity.ok(appointmentDTOList);
-        } catch (AppointmentNotFoundException e) {
-            throw new RuntimeException(e);
+        List<AppointmentDTO> appointmentDTOList = appointmentService.findAllAppointments(pageable);
+        if (appointmentDTOList.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } else {
+            return new ResponseEntity<>(appointmentDTOList, HttpStatus.OK);
         }
     }
+
     // Fetch all appointments by Patient Name
     @GetMapping("/patient")
-    public ResponseEntity<List<AppointmentDTO>> appointmentsByPatientName(@RequestParam String firstName,
-                                                                          @RequestParam String lastName) {
-        try {
-            List<AppointmentDTO> appointmentsByPatientName = appointmentService.findAppointmentsByPatientName(firstName,
-                            lastName).stream()
-                    .map(appointmentMapper::toAppointmentDTO)
-                    .collect(Collectors.toList());
+    public ResponseEntity<List<AppointmentDTO>> findAppointmentsByPatientName(@RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
+                                                                              @RequestParam(value = "pageSize", defaultValue = "10", required = false) int pageSize,
+                                                                              @RequestParam(value = "sortBy", defaultValue = "appointmentId", required = false) String sortBy,
+                                                                              @RequestParam(value = "order", defaultValue = "ascending", required = false) String order,
+                                                                              @RequestParam String firstName,
+                                                                              @RequestParam String lastName) {
 
-            return ResponseEntity.ok(appointmentsByPatientName);
+        Sort sort;
+        if (order.equalsIgnoreCase("ascending")) {
+            sort = Sort.by((sortBy)).ascending();
+        } else {
+            sort = Sort.by((sortBy)).descending();
+        }
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+
+        try {
+            List<AppointmentDTO> appointmentsByPatientName = appointmentService.findAppointmentsByPatientName(firstName, lastName, pageable);
+            return new ResponseEntity<>(appointmentsByPatientName, HttpStatus.OK);
         } catch (AppointmentNotFoundException e) {
             throw new RuntimeException(e);
         }
+    }
+    // Find all appointments by date
+    @GetMapping("/query")
+    public ResponseEntity<List<AppointmentDTO>> findAllAppointmentsByDate(@RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
+                                                                          @RequestParam(value = "pageSize", defaultValue = "10", required = false) int pageSize,
+                                                                          @RequestParam(value = "sortBy", defaultValue = "appointmentId", required = false) String sortBy,
+                                                                          @RequestParam(value = "order", defaultValue = "ascending", required = false) String order,
+                                                                          @RequestParam(value = "date") String appointmentDate) {
 
+        Sort sort;
+        if (order.equalsIgnoreCase("ascending")) {
+            sort = Sort.by((sortBy)).ascending();
+        } else {
+            sort = Sort.by((sortBy)).descending();
+        }
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+
+        try {
+            List<AppointmentDTO> appointmentsByDate = (List<AppointmentDTO>) appointmentService.findByAppointmentDate(appointmentDate, pageable);
+            return new ResponseEntity<>(appointmentsByDate, HttpStatus.OK);
+        } catch (AppointmentNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
     // Cancel Appointment by Appointment id
     @PutMapping("/{id}/cancel")
     public ResponseEntity<String> cancelAppointment(@PathVariable("id") Long appointmentId) {
         try {
             appointmentService.cancel(appointmentId);
-            return ResponseEntity.ok("Appointment cancelled");
+            return new ResponseEntity<>("Appointment cancelled.", HttpStatus.OK);
         } catch (AppointmentNotFoundException e) {
             throw new RuntimeException(e);
         }

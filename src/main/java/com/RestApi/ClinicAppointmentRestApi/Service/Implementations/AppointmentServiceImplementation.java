@@ -1,11 +1,13 @@
 package com.RestApi.ClinicAppointmentRestApi.Service.Implementations;
 
+import com.RestApi.ClinicAppointmentRestApi.DTOs.AppointmentDTO;
 import com.RestApi.ClinicAppointmentRestApi.Entities.Appointment;
 import com.RestApi.ClinicAppointmentRestApi.Entities.Doctor;
 import com.RestApi.ClinicAppointmentRestApi.Entities.Enums.AppointmentStatus;
 import com.RestApi.ClinicAppointmentRestApi.Entities.Enums.Availability;
 import com.RestApi.ClinicAppointmentRestApi.Entities.Patient;
 import com.RestApi.ClinicAppointmentRestApi.Exceptions.*;
+import com.RestApi.ClinicAppointmentRestApi.Mapper.AppointmentMapper;
 import com.RestApi.ClinicAppointmentRestApi.Repositories.AppointmentRepository;
 import com.RestApi.ClinicAppointmentRestApi.Repositories.DoctorRepository;
 import com.RestApi.ClinicAppointmentRestApi.Repositories.PatientRepository;
@@ -13,10 +15,15 @@ import com.RestApi.ClinicAppointmentRestApi.DTOs.AppointmentDateAndTimeRequest;
 import com.RestApi.ClinicAppointmentRestApi.DTOs.AppointmentRequest;
 import com.RestApi.ClinicAppointmentRestApi.Service.AppointmentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class AppointmentServiceImplementation implements AppointmentService {
@@ -29,55 +36,75 @@ public class AppointmentServiceImplementation implements AppointmentService {
     @Autowired
     private AppointmentRepository appointmentRepository;
 
+    @Autowired
+    private AppointmentMapper appointmentMapper;
+
 
     @Override
-    public Appointment create(AppointmentRequest request) throws DoctorNotFoundException, DoctorNotAvailableException, PatientNotFoundException {
+    public AppointmentDTO create(AppointmentRequest request) throws DoctorNotFoundException, DoctorNotAvailableException, PatientNotFoundException {
         Doctor doctor = doctorRepository.findById(request.getDoctorId())
-                .orElseThrow(()-> new DoctorNotFoundException(request.getDoctorId()));
+                .orElseThrow(() -> new DoctorNotFoundException(request.getDoctorId()));
         Patient patient = patientRepository.findById(request.getPatientId())
-                .orElseThrow(()-> new PatientNotFoundException(request.getPatientId()));
-
+                .orElseThrow(() -> new PatientNotFoundException(request.getPatientId()));
         Appointment appointment = new Appointment();
 
         appointment.setDoctor(doctor);
         if (!(appointment.getDoctor().getAvailability() == Availability.AVAILABLE)) {
             throw new DoctorNotAvailableException();
         }
+
         appointment.setPatient(patient);
         appointment.setAppointmentDate(request.getAppointmentDate());
         appointment.setAppointmentTime(request.getAppointmentTime());
         appointment.setAppointmentStatus(AppointmentStatus.BOOKED);
 
-        return appointmentRepository.save(appointment);
+        appointmentRepository.save(appointment);
+
+        return appointmentMapper.toAppointmentDTO(appointment);
+    }
+    @Override
+    public AppointmentDTO findAppointmentById(Long appointmentId) throws AppointmentNotFoundException{
+        Appointment appointment = appointmentRepository.findById(appointmentId)
+                    .orElseThrow(()-> new AppointmentNotFoundException(appointmentId));
+
+        return appointmentMapper.toAppointmentDTO(appointment);
+    }
+    @Override
+    public List<AppointmentDTO> findAllAppointments(Pageable pageable) {
+        Page<Appointment> appointments = appointmentRepository.findAll(pageable);
+
+        return appointments.getContent()
+                .stream()
+                .map(appointmentMapper::toAppointmentDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public Appointment findAppointmentById(Long appointmentId) throws AppointmentNotFoundException {
-        return appointmentRepository.findById(appointmentId)
-                .orElseThrow(()-> new AppointmentNotFoundException(appointmentId));
-    }
-    @Override
-    public List<Appointment> appointments() {
-        return appointmentRepository.findAll();
-    }
+    public List<AppointmentDTO> findAppointmentsByPatientName(String firstName, String lastName, Pageable pageable) throws AppointmentNotFoundException {
+        Page<Appointment> appointmentPage = appointmentRepository.findAppointmentsByPatientName(firstName, lastName, pageable);
+        List<Appointment> appointmentsByPatientName = appointmentPage.getContent();
 
-    @Override
-    public List<Appointment> findAppointmentsByPatientName(String firstName, String lastName) throws AppointmentNotFoundException {
-        List<Appointment> appointmentList = appointmentRepository.findAppointmentsByPatientName(firstName,
-                lastName);
-        if (appointmentList.isEmpty()) {
+        if (appointmentsByPatientName.isEmpty()) {
             throw new AppointmentNotFoundException("Appointments for patient = " + firstName
                     + " " + lastName + " not found.");
         }
-        return appointmentList;
+        return appointmentsByPatientName.stream()
+                .map(appointmentMapper::toAppointmentDTO)
+                .collect(Collectors.toList());
     }
     @Override
-    public List<Appointment> findByAppointmentDate(String appointmentDate) throws AppointmentNotFoundException {
-        List<Appointment> appointments = appointmentRepository.findByAppointmentDate(appointmentDate);
-        if (appointments.isEmpty()){
+    public List<AppointmentDTO> findByAppointmentDate(String appointmentDate, Pageable pageable) throws AppointmentNotFoundException {
+        Page<Appointment> appointments = appointmentRepository.findByAppointmentDate(appointmentDate, pageable);
+        List<Appointment> appointmentList = appointments.getContent();
+
+
+        if (appointmentList.isEmpty()){
             throw new AppointmentNotFoundException("Appointment with date = " + appointmentDate + " not found.");
         }
-        return appointments;
+
+        return appointmentList.stream()
+                .map(appointmentMapper::toAppointmentDTO)
+                .collect(Collectors.toList());
     }
     @Override
     public void cancel(Long appointmentId) throws AppointmentNotFoundException {

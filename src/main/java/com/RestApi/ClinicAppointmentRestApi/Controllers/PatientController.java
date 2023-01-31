@@ -23,7 +23,7 @@ public class PatientController {
     }
 
     // For creating new patient record
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<Patient> create(@Valid @RequestBody Patient patient) {
         Patient patientRecord = patientService.create(patient);
 
@@ -75,7 +75,7 @@ public class PatientController {
             throw new RuntimeException(e);
         }
     }
-    @PutMapping("/{id}")
+    @PutMapping("/{id}/update")
     public ResponseEntity<Patient> update(@PathVariable("id") Long patientId,
                                           @RequestBody Patient patient) {
 

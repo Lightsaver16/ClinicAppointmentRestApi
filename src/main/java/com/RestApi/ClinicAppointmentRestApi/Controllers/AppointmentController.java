@@ -34,7 +34,7 @@ public class AppointmentController {
     }
 
     // Create new appointment
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<AppointmentDTO> create (@Valid @RequestBody AppointmentRequest appointmentRequest) {
 
         try {
@@ -77,7 +77,7 @@ public class AppointmentController {
     }
 
     // Fetch all appointments by Patient Name
-    @GetMapping("/patient")
+    @GetMapping("/patient-name")
     public ResponseEntity<List<AppointmentDTO>> findAppointmentsByPatientName(@RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
                                                                               @RequestParam(value = "pageSize", defaultValue = "10", required = false) int pageSize,
                                                                               @RequestParam(value = "sortBy", defaultValue = "appointmentId", required = false) String sortBy,

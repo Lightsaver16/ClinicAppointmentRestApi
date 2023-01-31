@@ -21,7 +21,7 @@ public class DoctorController {
     }
 
     // Create a new record of doctor
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<Doctor> create(@Valid @RequestBody Doctor doctor) {
         Doctor doctorRecord = doctorService.create(doctor);
 
@@ -60,7 +60,7 @@ public class DoctorController {
     }
 
     // Update a record of doctor by id
-    @PutMapping("/{id}")
+    @PutMapping("/{id}/update")
     public ResponseEntity<Doctor> update(@PathVariable("id") Long doctorId,
                                          @RequestBody Doctor doctor) {
         try {
@@ -72,7 +72,7 @@ public class DoctorController {
     }
 
     // Delete a record of doctor by id
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{id}/delete")
     public ResponseEntity<String> delete(@PathVariable("id") Long doctorId) {
         try {
             doctorService.delete(doctorId);

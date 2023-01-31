@@ -1,5 +1,6 @@
 package com.RestApi.ClinicAppointmentRestApi.Service;
 
+import com.RestApi.ClinicAppointmentRestApi.DTOs.AppointmentDTOInPatient;
 import com.RestApi.ClinicAppointmentRestApi.Entities.Appointment;
 import com.RestApi.ClinicAppointmentRestApi.Entities.Patient;
 import com.RestApi.ClinicAppointmentRestApi.Exceptions.PatientNotFoundException;
@@ -18,7 +19,6 @@ public interface PatientService {
     Patient update(Long patientId, Patient patient) throws PatientNotFoundException;
 
     void delete(Long patientId) throws PatientNotFoundException;
-    List<Appointment> appointmentsByPatient(Long patientId) throws PatientNotFoundException;
+    List<AppointmentDTOInPatient> appointmentsByPatient(Long patientId) throws PatientNotFoundException;
 
-//    Patient update(Long patientId, Patient patient) throws PatientNotFoundException;
 }

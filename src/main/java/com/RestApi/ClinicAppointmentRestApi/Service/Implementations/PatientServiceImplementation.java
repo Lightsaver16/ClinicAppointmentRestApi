@@ -1,8 +1,10 @@
 package com.RestApi.ClinicAppointmentRestApi.Service.Implementations;
 
+import com.RestApi.ClinicAppointmentRestApi.DTOs.AppointmentDTOInPatient;
 import com.RestApi.ClinicAppointmentRestApi.Entities.Appointment;
 import com.RestApi.ClinicAppointmentRestApi.Entities.Patient;
 import com.RestApi.ClinicAppointmentRestApi.Exceptions.PatientNotFoundException;
+import com.RestApi.ClinicAppointmentRestApi.Mapper.AppointmentMapper;
 import com.RestApi.ClinicAppointmentRestApi.Repositories.PatientRepository;
 import com.RestApi.ClinicAppointmentRestApi.Service.PatientService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,11 +12,20 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class PatientServiceImplementation implements PatientService {
-    @Autowired
+
     private PatientRepository patientRepository;
+
+    private AppointmentMapper appointmentMapper;
+
+    @Autowired
+    public PatientServiceImplementation(PatientRepository patientRepository, AppointmentMapper appointmentMapper) {
+        this.patientRepository = patientRepository;
+        this.appointmentMapper = appointmentMapper;
+    }
 
     @Override
     public Patient create(Patient patient) {
@@ -76,11 +87,13 @@ public class PatientServiceImplementation implements PatientService {
     }
 
     @Override
-    public List<Appointment> appointmentsByPatient(Long patientId) throws PatientNotFoundException {
+    public List<AppointmentDTOInPatient> appointmentsByPatient(Long patientId) throws PatientNotFoundException {
         Patient patient = patientRepository.findById(patientId)
                 .orElseThrow(()-> new PatientNotFoundException(patientId));
 
-        return patient.getAppointments();
+        return patient.getAppointments().stream()
+                .map(appointmentMapper::toAppointmentDTOInPatient)
+                .collect(Collectors.toList());
     }
 
 }

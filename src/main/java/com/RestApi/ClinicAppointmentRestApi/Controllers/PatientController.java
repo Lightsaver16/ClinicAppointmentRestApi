@@ -3,9 +3,7 @@ package com.RestApi.ClinicAppointmentRestApi.Controllers;
 import com.RestApi.ClinicAppointmentRestApi.DTOs.AppointmentDTOInPatient;
 import com.RestApi.ClinicAppointmentRestApi.Entities.Patient;
 import com.RestApi.ClinicAppointmentRestApi.Exceptions.PatientNotFoundException;
-import com.RestApi.ClinicAppointmentRestApi.Mapper.AppointmentMapper;
 import com.RestApi.ClinicAppointmentRestApi.Service.PatientService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,11 +16,11 @@ import java.util.stream.Collectors;
 @RequestMapping("api/patients")
 public class PatientController {
 
-    @Autowired
     private PatientService patientService;
 
-    @Autowired
-    private AppointmentMapper appointmentMapper;
+    public PatientController(PatientService patientService) {
+        this.patientService = patientService;
+    }
 
     // For creating new patient record
     @PostMapping
@@ -58,10 +56,7 @@ public class PatientController {
     public ResponseEntity<List<AppointmentDTOInPatient>> appointmentsOfPatient(@PathVariable("id") Long patientId) {
 
         try {
-            List<AppointmentDTOInPatient> appointmentsByPatient = patientService.appointmentsByPatient(patientId)
-                    .stream()
-                    .map(appointmentMapper::toAppointmentDTOInPatient)
-                    .collect(Collectors.toList());
+            List<AppointmentDTOInPatient> appointmentsByPatient = patientService.appointmentsByPatient(patientId);
 
             return new ResponseEntity<>(appointmentsByPatient, HttpStatus.OK);
         } catch (PatientNotFoundException e) {

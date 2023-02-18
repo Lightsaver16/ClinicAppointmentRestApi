@@ -44,14 +44,6 @@ The service layer acts a separate layer that will handle all the business logic.
 
 The repository layer, as the name implies, will handle all the transaction to and from the database. For this case, the database used is MySQL.
 
-
-
-## 🔗 My Linkedin
-
-[![linkedin](https://img.shields.io/badge/linkedin-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/joshua-sumagang-7208b8236/)
-
-
-
 ## Tools and Dependencies used
 
 **Framework:** Spring Boot
@@ -61,4 +53,9 @@ The repository layer, as the name implies, will handle all the transaction to an
 **Database:** MySQL
 
 **Testing API:** Postman
+
+## 🔗 My Linkedin
+
+[![linkedin](https://img.shields.io/badge/linkedin-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/joshua-sumagang-7208b8236/)
+
 

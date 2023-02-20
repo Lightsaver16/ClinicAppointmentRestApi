@@ -29,7 +29,7 @@ Starting from the Admin (client), they can directly create, read, update and del
 
 Currently learning Spring Security to add authentication process for admin privileges (e.g. Secretary and Doctors). 
 
-Both doctor and patient entities have basic crud functionalities. For creating a new appointment, it requires a doctor id and patient id.
+Both doctor and patient entities have basic crud functionalities. So for the workflow of the api, create first a new record of patient and doctors. Upon creating a new doctor record, availability of the doctor will be automatically set to AVAILABLE. For creating a new appointment, it requires a doctor id and patient id, where doctor should have the status of AVAILABLE, otherwise, it will throw and exception.
 
 <h4>Entities</h4>
 
@@ -43,6 +43,12 @@ This is the general design pattern for each entities. Everytime a client sends a
 The service layer acts a separate layer that will handle all the business logic.
 
 The repository layer, as the name implies, will handle all the transaction to and from the database. For this case, the database used is MySQL.
+
+## API Reference
+
+<h3><a href="Appointments-API Reference.md" target="_blank">Appointments</a></h3>
+<h3>Doctors</h3>
+<h3>Patients</h3>
 
 ## Tools and Dependencies used
 

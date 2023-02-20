@@ -56,7 +56,7 @@ public class AppointmentController {
     }
     // Fetch all appointment records then convert to dto
     @GetMapping
-    public ResponseEntity<List<AppointmentDTO>> findAllAppointments(@RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
+    public ResponseEntity<List<AppointmentDTO>> findAllAppointments(@RequestParam(value = "pageNo", defaultValue = "1", required = false) int pageNo,
                                                                     @RequestParam(value = "pageSize", defaultValue = "10", required = false) int pageSize,
                                                                     @RequestParam(value = "sortBy", defaultValue = "appointmentId", required = false) String sortBy,
                                                                     @RequestParam(value = "order", defaultValue = "ascending", required = false) String order){
@@ -66,7 +66,7 @@ public class AppointmentController {
         } else {
             sort = Sort.by((sortBy)).descending();
         }
-        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+        Pageable pageable = PageRequest.of(pageNo - 1, pageSize, sort);
 
         List<AppointmentDTO> appointmentDTOList = appointmentService.findAllAppointments(pageable);
         if (appointmentDTOList.isEmpty()) {

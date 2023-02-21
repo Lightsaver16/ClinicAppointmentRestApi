@@ -12,11 +12,10 @@ import java.util.List;
 
 @Repository
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
-    Page<Appointment> findByAppointmentDate(String appointmentDate, Pageable pageable);
+    List<Appointment> findByAppointmentDate(String appointmentDate);
 
     @Query("SELECT a from Appointment a JOIN Patient p ON a.patient = p " +
             "WHERE p.firstName = :firstName AND p.lastName = :lastName")
-    Page<Appointment> findAppointmentsByPatientName(@Param("firstName") String firstName,
-                                                    @Param("lastName") String lastName,
-                                                    Pageable pageable);
+    List<Appointment> findAppointmentsByPatientName(@Param("firstName") String firstName,
+                                                    @Param("lastName") String lastName);
 }

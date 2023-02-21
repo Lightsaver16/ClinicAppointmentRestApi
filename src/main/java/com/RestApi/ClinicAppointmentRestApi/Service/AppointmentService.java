@@ -14,8 +14,8 @@ public interface AppointmentService {
     AppointmentDTO create(AppointmentRequest request) throws DoctorNotFoundException, DoctorNotAvailableException, PatientNotFoundException;
     AppointmentDTO findAppointmentById(Long AppointmentId) throws AppointmentNotFoundException;
     List<AppointmentDTO> findAllAppointments(Pageable pageable);
-    List<AppointmentDTO> findAppointmentsByPatientName(String firstName, String lastName, Pageable pageable) throws AppointmentNotFoundException;
-    List<AppointmentDTO> findByAppointmentDate(String appointmentDate, Pageable pageable) throws AppointmentNotFoundException;
+    List<AppointmentDTO> findAppointmentsByPatientName(String firstName, String lastName) throws AppointmentNotFoundException;
+    List<AppointmentDTO> findByAppointmentDate(String appointmentDate) throws AppointmentNotFoundException;
     void cancel(Long appointmentId) throws AppointmentNotFoundException;
     AppointmentDTO changeDateAndTime(Long appointmentId, AppointmentDateAndTimeRequest request) throws AppointmentNotFoundException, AppointmentCannotBeUpdatedException, PatientNotFoundException;
     AppointmentDTO changeDoctor(Long appointmentId, Long doctorId) throws AppointmentNotFoundException, DoctorNotFoundException;

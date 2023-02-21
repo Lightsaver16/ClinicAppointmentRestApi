@@ -80,9 +80,8 @@ public class AppointmentServiceImplementation implements AppointmentService {
     }
 
     @Override
-    public List<AppointmentDTO> findAppointmentsByPatientName(String firstName, String lastName, Pageable pageable) throws AppointmentNotFoundException {
-        Page<Appointment> appointmentPage = appointmentRepository.findAppointmentsByPatientName(firstName, lastName, pageable);
-        List<Appointment> appointmentsByPatientName = appointmentPage.getContent();
+    public List<AppointmentDTO> findAppointmentsByPatientName(String firstName, String lastName) throws AppointmentNotFoundException {
+        List<Appointment> appointmentsByPatientName = appointmentRepository.findAppointmentsByPatientName(firstName, lastName);
 
         if (appointmentsByPatientName.isEmpty()) {
             throw new AppointmentNotFoundException("Appointments for patient = " + firstName
@@ -93,10 +92,8 @@ public class AppointmentServiceImplementation implements AppointmentService {
                 .collect(Collectors.toList());
     }
     @Override
-    public List<AppointmentDTO> findByAppointmentDate(String appointmentDate, Pageable pageable) throws AppointmentNotFoundException {
-        Page<Appointment> appointments = appointmentRepository.findByAppointmentDate(appointmentDate, pageable);
-        List<Appointment> appointmentList = appointments.getContent();
-
+    public List<AppointmentDTO> findByAppointmentDate(String appointmentDate) throws AppointmentNotFoundException {
+        List<Appointment> appointmentList = appointmentRepository.findByAppointmentDate(appointmentDate);
 
         if (appointmentList.isEmpty()){
             throw new AppointmentNotFoundException("Appointment with date = " + appointmentDate + " not found.");

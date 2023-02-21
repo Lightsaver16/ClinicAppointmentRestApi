@@ -49,8 +49,8 @@ The repository layer, as the name implies, will handle all the transaction to an
 ## API Reference
 
 <h3><a href="Appointments-API Reference.md" target="_blank">Appointments</a></h3>
-<h3>Doctors</h3>
-<h3>Patients</h3>
+<h3><a href="Doctor-API.md" target="_blank">Doctors</a></h3>
+<h3><a href="Patient-API Reference.md" target="_blank">Patients</a></h3>
 
 ## Tools and Dependencies used
 

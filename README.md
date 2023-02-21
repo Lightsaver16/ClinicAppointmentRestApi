@@ -31,6 +31,8 @@ Currently learning Spring Security to add authentication process for admin privi
 
 Both doctor and patient entities have basic crud functionalities. So for the workflow of the api, create first a new record of patient and doctors. Upon creating a new doctor record, availability of the doctor will be automatically set to AVAILABLE. For creating a new appointment, it requires a doctor id and patient id, where doctor should have the status of AVAILABLE, otherwise, it will throw and exception.
 
+Every appointment record has only one patient and doctor. In contrast, patients and doctors can have many appointments. In this regard, the relationship between patient-appointment and doctor-appointment is Many to One (annotated with @ManyToOne).
+
 <h4>Entities</h4>
 
 <img
